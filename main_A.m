@@ -3,28 +3,31 @@ clearvars
 clc
 close all
 
+% Project part A
+
 fnum = 0;
 cf = 50;
-
-% Project part A
 
 load('tvxo93.mat');
 load('tid93');
 
 y = tvxo93;
 % Starting time is week 13 day 5 0:00
+
 startWeek = 14;
+predWeeks = 5;
+totWeeks = startWeek + predWeeks;
 
-yM = y((startWeek - 1)*7*24 + 1:(startWeek + 10 - 1)*7*24);
+y(1) = [];
 
-% Downsample by 3 to remove interpolation
-yM(1) = [];
-yM = downsample(yM, 3);
+% Remove interpolated data
+y = downsample(y, 3);
 
+yM = y((startWeek - 1)*7*8 + 1:(startWeek + 10 - 1)*7*8);
 yOrig = yM;
 
-time = (1:length(y))/(24*7);
-timeM = 3*(1:length(yM))/(24*7);
+time = (1:length(y))/(8*7);
+timeM = 3*(1:length(yM))/(8*7);
 
 fnum = fnum + 1;
 figure(fnum)
@@ -178,46 +181,93 @@ C = arma_model.c;
 A_star = conv(A, A8);
 %% k = 1
 k = 1;
+
+yValid = y(((startWeek + 10 - 1)*7*8) + 1 - k: (startWeek + 10 + predWeeks - 1)*7*8 + 1);
+
 [F,G] = func_poldiv(A_star,C,k);
-yhat = filter(G,C,yOrig);
-%yhat = yhat + myM;
+yhat = filter(G,C,yValid);
+yhat(1:k) = [];
+yValid(1:k) = [];
+
+timeV = 3*(1:length(yValid))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(yOrig)
+plot(timeV, yValid, timeV, yhat)
 title([num2str(k), '-step prediction'])
-hold on
-plot(yhat)
-hold off
+xlabel('Weeks')
+ylabel('Temperature')
 
-err1step = yOrig(k+1:end)-yhat(k+1:end);
+err1step = yValid - yhat;
 err1step_var = var(err1step);
 
-fnum = func_plotacfpacf(fnum, err1step, cf, 0.05, ['residuals prediction k=', num2str(k)]);
+fnum = fnum + 1;
+figure(fnum)
+acf(err1step, cf, 0.05, true, 0, 0)
+title(['Residuals prediction k=', num2str(k)])
 
-%% k = 8
-k = 8;
+%% k = 3
+k = 3;
+
+yValid = y(((startWeek + 10 - 1)*7*8) + 1 - k: (startWeek + 10 + predWeeks - 1)*7*8 + 1);
+
 [F,G] = func_poldiv(A_star,C,k);
-yhat = filter(G,C,yOrig);
+yhat = filter(G,C,yValid);
+yhat(1:k) = [];
+yValid(1:k) = [];
+
+timeV = 3*(1:length(yValid))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(yOrig)
+plot(timeV, yValid, timeV, yhat)
 title([num2str(k), '-step prediction'])
-hold on
-plot(yhat)
-hold off
+xlabel('Weeks')
+ylabel('Temperature')
 
-err3step = yOrig(k+1:end)-yhat(k+1:end);
+err3step = yValid - yhat;
 err3step_var = var(err3step);
 
 fnum = fnum + 1;
 figure(fnum)
-acf(err3step, cf, 0.05, true, 0, 0);
-title('ACF for 3 step (9hr) prediction')
+acf(err3step, cf, 0.05, true, 0, 0)
+title(['Residuals prediction k=', num2str(k)])
+
+%% k = 8 - One full day
+k = 8;
+
+yValid = y(((startWeek + 10 - 1)*7*8) + 1 - k: (startWeek + 10 + predWeeks - 1)*7*8 + 1);
+
+[F,G] = func_poldiv(A_star,C,k);
+yhat = filter(G,C,yValid);
+yhat(1:k) = [];
+yValid(1:k) = [];
+
+timeV = 3*(1:length(yValid))/(24*7);
+
+fnum = fnum+1;
+figure(fnum)
+plot(timeV, yValid, timeV, yhat)
+title([num2str(k), '-step prediction'])
+xlabel('Weeks')
+ylabel('Temperature')
+
+err8step = yValid - yhat;
+err8step_var = var(err8step);
+
+fnum = fnum + 1;
+figure(fnum)
+acf(err8step, cf, 0.05, true, 0, 0)
+title(['Residuals prediction k=', num2str(k)])
 
 %% Save polynomials for A, C
-save('ourModel', 'arma_model')
+
+err1step_A_var = err1step_var;
+err3step_A_var = err3step_var;
+err8step_A_var = err8step_var;
+
+save('Model_A', 'C', 'A_star')
+save('variances_A', 'err1step_A_var', 'err3step_A_var', 'err8step_A_var')
 
 
 

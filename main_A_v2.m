@@ -268,8 +268,9 @@ title(['Residuals prediction k=', num2str(k)])
 err1step_A_var = err1step_var;
 err8step_A_var = err8step_var;
 
-save('Model_A', 'C', 'A_star')
-% save('variances_A', 'err1step_A_var', 'err8step_A_var')
+save('Model_A', 'best_model')
+save('variances_valid_A', 'err1step_A_var', 'err8step_A_var')
+
 
 
 

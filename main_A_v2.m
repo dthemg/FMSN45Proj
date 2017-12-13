@@ -226,6 +226,7 @@ title(['Residuals prediction k=', num2str(k)])
 
 fnum = fnum + 1;
 figure(fnum)
+disp(['Whiteness test for k=' num2str(k)])
 whitenessTest(err1step)
 title(['Cumulative periodogram for k=' num2str(k)])
 

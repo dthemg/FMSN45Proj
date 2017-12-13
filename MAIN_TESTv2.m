@@ -41,13 +41,17 @@ uModel = u((startDay*24 + (modelWeek + testWeek)*7*24 + 1 - hrsInYear - removed)
 
 % Remove erronous samples in yModel
 yModel(1:24:end) = nan;
-yModel = fillmissing(yModel,'linear');
+yModel = fillmissing(yModel, 'linear');
+
+timeM = (1:length(uModel))/(24*7);
 
 fnum = fnum + 1;
 figure(fnum)
-plot(yModel)
+plot(timeM, yModel)
 hold on
-plot(uModel)
+plot(timeM, uModel)
+xlabel('Week')
+ylabel('Temperature')
 title('Temperature and input for modeling period')
 legend('Svedala', 'Sturup')
 
@@ -75,9 +79,9 @@ timeM = (1:length(yM))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(timeM, yM, 'k')
+plot(timeM, yM)
 hold on
-plot(timeM, yhat, 'b')
+plot(timeM, yhat)
 title(['Model ', mod, ' ',num2str(k), '-step prediction'])
 xlabel('Weeks')
 ylabel('Temperature')
@@ -105,9 +109,9 @@ timeM = (1:length(yM))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(timeM, yM, 'k')
+plot(timeM, yM)
 hold on
-plot(timeM, yhat, 'b')
+plot(timeM, yhat)
 title(['Model ', mod, ' ',num2str(k), '-step prediction'])
 xlabel('Weeks')
 ylabel('Temperature')
@@ -120,11 +124,6 @@ fnum = fnum + 1;
 figure(fnum)
 acf(err1step, cf, 0.05, true, 0, 0);
 title(['Model ', mod, ', Residuals prediction k=', num2str(k)])
-
-fnum = fnum + 1;
-figure(fnum)
-whitenessTest(err1step)
-title(['Cumulative periodogram for k=' num2str(k)])
 
 %% ############## MODEL B ##############
 
@@ -159,9 +158,9 @@ timeM = (1:length(yhat))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(timeM, yM, 'k')
+plot(timeM, yM)
 hold on
-plot(timeM, yhat, 'b')
+plot(timeM, yhat)
 title(['Model ', mod, ' ',num2str(k), '-step prediction'])
 xlabel('Weeks')
 ylabel('Temperature')
@@ -172,7 +171,7 @@ err1stepB_mod_var = var(err1step);
 
 fnum = fnum + 1;
 figure(fnum)
-acf(err1step, cf, 0.05, true, 0, 0)
+acf(err1step, cf, 0.05, true, 0, 0);
 title(['Model ', mod, ', Residuals prediction k=', num2str(k)])
 
 %% Model B, k = 8
@@ -193,9 +192,9 @@ timeM = (1:length(yhat))/(24*7);
 
 fnum = fnum+1;
 figure(fnum)
-plot(timeM, yM, 'k')
+plot(timeM, yM)
 hold on
-plot(timeM, yhat, 'b')
+plot(timeM, yhat)
 title(['Model ', mod, ' ',num2str(k), '-step prediction'])
 xlabel('Weeks')
 ylabel('Temperature')
@@ -206,7 +205,39 @@ err8stepB_mod_var = var(err1step);
 
 fnum = fnum + 1;
 figure(fnum)
-acf(err1step, cf, 0.05, true, 0, 0)
+acf(err1step, cf, 0.05, true, 0, 0);
 title(['Model ', mod, ', Residuals prediction k=', num2str(k)])
+
+%% Plot results
+barWidth = 0.4;
+
+fnum = fnum + 1;
+figure(fnum)
+c = categorical({'Model A', 'Model B'});
+bar(c, [err1stepA_mod_var, err1stepB_mod_var], ...
+    'FaceColor', [0.8500    0.3250    0.0980], 'BarWidth', barWidth)
+grid on
+title('Comparison error 1 step predictions')
+ylabel('Error')
+
+fnum = fnum + 1;
+figure(fnum)
+bar(c, [err8stepA_mod_var, err8stepB_mod_var], ...
+    'FaceColor', [0.8500    0.3250    0.0980], 'BarWidth', barWidth)
+grid on
+title('Comparison error 8 step predictions')
+ylabel('Error')
+
+
+
+
+
+
+
+
+
+
+
+
 
 

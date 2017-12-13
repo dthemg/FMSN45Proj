@@ -80,11 +80,7 @@ plot(timeM((rm+1):end), yM)
 title('temperature, after deseasoning')
 xlabel('Time [Weeks]')
 
-fnum = func_plotacfpacf(fnum, yM, cf, 0.05, 'after deseasoning');
-
-% fnum = fnum+1;
-% figure(fnum)
-% tacf(yM,cf,0.05,0.05,true,0)
+fnum = func_plotacfpacf(fnum, yM, cf, 0.05, 'deseasoned data');
 
 % testMean() gives 0, meaning we cannot say if different from 0
 disp('testMean result after deseasoning')
@@ -113,12 +109,13 @@ ar_model = pem(data_yM, model_init);
 
 res3 = resid(ar_model, data_yM);
 fnum = func_plotacfpacf(fnum, res3.y, cf, 0.05, 'residuals ar(24) with a_1 a_2');
+
 %% AR(1)
 ar_model2 = arx(data_yM, 1);
 
 res1 = resid(ar_model2, data_yM);
 
-fnum = func_plotacfpacf(fnum, res1.y, cf, 0.05, 'residuals ar1');
+fnum = func_plotacfpacf(fnum, res1.y, cf, 0.05, 'residuals ar(1)');
 
 %% AR(2)
 ar_model2 = arx(data_yM, 2);
@@ -236,10 +233,6 @@ filtermax = 24;
 z = max(k,filtermax);
 
 yValid = y((startday*24 + modelweek*24*7 + 1 - k): (startday*24 + (modelweek + predWeeks)*24*7));
-
-fnum = fnum+1;
-figure(fnum)
-plot(yValid)
 
 [F,G] = func_poldiv(A_star,C,k);
 yhat = filter(G,C,yValid);

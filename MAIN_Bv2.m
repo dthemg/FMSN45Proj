@@ -39,7 +39,7 @@ uM = fillmissing(uM, 'linear');
 fnum = fnum + 1;
 figure(fnum)
 plot(uM)
-title('After removal of outliers')
+title('Input data after outlier truncation')
 
 timeM = (1:length(uM))/(24*7);
 
@@ -86,6 +86,12 @@ uM = filter(A24, 1, uM);
 uM(1:rm) = [];
 
 fnum = func_plotacfpacf(fnum, uM, cf, 0.05, 'after deseasoning');
+
+% Checking normality after deseasoning
+fnum = fnum + 1;
+figure(fnum)
+normplot(uM)
+title('Normality of SMHI prediction after deseasoning')
 
 %% Look for outliers
 
@@ -177,7 +183,6 @@ fnum = func_plotacfpacf(fnum, res.y, cf, 0.05, 'residuals arma(24,24)');
 present(arma_model)
 
 %% AR(24,24)
-close all
 cf = 40;
 
 model_init = idpoly([1, zeros(1,24)], [], [1, zeros(1,24)]);
@@ -204,10 +209,7 @@ subplot(212)
 tacf(res.y, cf, 0.05, 0.05, true, 0);
 title('TACF')
 
-best_prew_model = arma_model;
-
 %% TEST TEST TEST
-close all
 cf = 50;
 
 model_init = idpoly([1, zeros(1,25)], [], [1, zeros(1,25)]);
@@ -252,6 +254,8 @@ uM_pw(1:rm) = [];
 
 yM_pw = filter(A_star, best_prew_model.c, yNonD);
 yM_pw(1:rm) = [];
+
+%% 
 
 fnum = fnum + 1;
 figure(fnum)
@@ -325,20 +329,17 @@ res3 = resid(arma_model, data_x);
 fnum = func_plotacfpacf(fnum, res3.y, cf, 0.05, 'residuals arma(2,24) a_1 a_2 c_{24}');
 present(arma_model)
 
-best_c1a1_model = arma_model;
-
-
 %% TEST TEST TEST
-
-close all
 model_init = idpoly([1, zeros(1, 11)], [], [1, zeros(1,25)]);
 model_init.Structure.c.Free = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, zeros(1, 11), 1, 1];
 model_init.Structure.a.Free = [0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1];
 arma_model = pem(data_x, model_init);
 
 res3 = resid(arma_model, data_x);
-fnum = func_plotacfpacf(fnum, res3.y, cf, 0.05, 'residuals arma(11, 25) a_1-a_4, a_{11}, c_1, c_{24}, c_{25}');
+fnum = func_plotacfpacf(fnum, res3.y, cf, 0.05, 'residuals arma(11, 25) a_1 a_4, a_{11}, c_1, c_{24}, c_{25}');
 present(arma_model)
+
+best_c1a1_model = arma_model;
 
 %% Final model TEST - (d,r,s) = (0,0,0), C1 - 25, A1 - 11, A2 - 0
 

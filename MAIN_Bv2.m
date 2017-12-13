@@ -218,7 +218,7 @@ model_init.Structure.c.Free = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, z
 arma_model = pem(data_uM, model_init);
 
 res = resid(arma_model, data_uM);
-fnum = func_plotacfpacf(fnum, res.y, cf, 0.05, 'residuals arma(24,24)');
+fnum = func_plotacfpacf(fnum, res.y, cf, 0.05, 'residuals arma(25,25) a_1, a_3, a_4, a_{24}, a_{25}, c_1, c_{24}, c_{25}');
 
 present(arma_model)
 
@@ -278,6 +278,7 @@ fnum = func_plotacfpacf(fnum, yM_pw, cf, 0.05, 'yM_pw');
 %% Checking crosscorrelation function between prewhitened x and y
 
 fnum = func_plotccf(fnum, uM_pw, yM_pw, cf, 'prewhitened u and y');
+
 
 % d = r = s = 0 
 
@@ -443,7 +444,7 @@ err8step_var = var(err8step);
 
 fnum = fnum + 1;
 figure(fnum)
-acf(err1step, cf, 0.05, true, 0, 0);
+acf(err8step, cf, 0.05, true, 0, 0);
 title(['Residuals prediction k=', num2str(k)])
 
 %% Save results

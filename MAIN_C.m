@@ -6,8 +6,8 @@ fnum = 0;
 cf = 50;
 
 load model_A
-Am = A;
-Cm = C;
+Am = best_model.A;
+Cm = best_model.C;
 S = 24;
 
 load('utempSla_9395.dat')
@@ -23,6 +23,11 @@ predWeeks = 10;
 yM = y(startday*24+1:startday*24+modelweek*7*24);
 yM(519) = nan; % taking out the outlier
 yM = fillmissing(yM,'linear');
+
+% Removing outliers in input data
+[indicies] = func_findoutliers(yM, 0.02);
+yM(find(indicies - 1)) = nan;
+yM = fillmissing(yM, 'linear');
 
 fnum = fnum+1;
 figure(fnum)
@@ -49,7 +54,8 @@ N = length(y)
 % State space equation definition
 ord = 4;
 A = eye(ord);
-Re = diag([10e-4 10e-4 0 10e-4]); % Hiden state noise covariance matrix
+% Re = diag([10e-4 10e-4 0 10e-4]); % Hiden state noise covariance matrix
+Re = diag([0 0 0 5*10e-6]);
 Rw = 25; % Observation variance
 % usually C should be set here to, but in this case C is a function of time
 
@@ -79,10 +85,10 @@ for n = 27:N
     % Prediction
     for k = 1:K
         if k == 1
-            Ck = [-yFull(n)+yFull(n-1-S+k) -yFull(n-1)+yFull(n-2-S+k) -yFull(n-S+k) e(n-24+k)];
+            Ck = [-yFull(n-1+k)+yFull(n-1-S+k) -yFull(n-2+k)+yFull(n-2-S+k) -yFull(n-S+k) e(n-24+k)];
             yhat(k,n) = Ck*xtt_1;
         elseif k == 2
-            Ck = [-yhat(k-1,n)+yFull(n-1-S+k) -yFull(n)+yFull(n-2-S+k) -yFull(n-S+k) e(n-24+k)];
+            Ck = [-yhat(k-1,n)+yFull(n-1-S+k) -yFull(n-2+k)+yFull(n-2-S+k) -yFull(n-S+k) e(n-24+k)];
             yhat(k,n) = Ck*xtt_1;
         else
             Ck = [-yhat(k-1,n)+yFull(n-1-S+k) -yhat(k-2,n)+yFull(n-2-S+k) -yFull(n-S+k) e(n-24+k)];
@@ -136,6 +142,7 @@ title('Normplot for error k=1')
 %% k = 8 prediction
 kk = 8;
 yhat_8 = yhat(kk,modelweek*24*7 + 1-kk:end-kk);
+% yValid = yValid(100+1:end);
 err_8 = yValid - yhat_8';
 err_8_var = var(err_8);
 time = 1:length(yValid);
@@ -148,3 +155,11 @@ fnum = fnum +1;
 figure(fnum)
 normplot(err_8)
 title('Normplot for error k=8')
+
+%%
+fnum = fnum +1;
+figure(fnum)
+plot(resid)
+err1step_C_var = err_1_var;
+err8step_C_var = err_8_var;
+save('variances_valid_C', 'err1step_C_var', 'err8step_C_var')

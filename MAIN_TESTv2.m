@@ -19,6 +19,11 @@ model_B = MboxJ;
 % Load validation variances
 load('variances_valid_A.mat')
 load('variances_valid_B.mat')
+load('variances_valid_C.mat')
+load('variances_valid_Cinput.mat')
+load('test_C_var.mat')
+load('test_Cinput_var.mat')
+
 
 % Load data
 load('utempSla_9395.dat')
@@ -68,7 +73,6 @@ A_star = conv(A, A24);
 k = 1;
 
 yM = yModel;
-
 
 [F,G] = func_poldiv(A_star, C, k);
 yhat = filter(G, C, yM);
@@ -213,8 +217,8 @@ barWidth = 0.4;
 
 fnum = fnum + 1;
 figure(fnum)
-c = categorical({'Model A', 'Model B'});
-bar(c, [err1stepA_mod_var, err1stepB_mod_var], ...
+c = categorical({'Model A', 'Model B', 'Model A recursive', 'Model B recursive'});
+bar(c, [err1stepA_mod_var, err1stepB_mod_var, err1stepC_mod_var, err1stepCinput_mod_var], ...
     'FaceColor', [0.8500    0.3250    0.0980], 'BarWidth', barWidth)
 grid on
 title('Comparison error 1 step predictions')
@@ -222,7 +226,7 @@ ylabel('Error')
 
 fnum = fnum + 1;
 figure(fnum)
-bar(c, [err8stepA_mod_var, err8stepB_mod_var], ...
+bar(c, [err8stepA_mod_var, err8stepB_mod_var, err8stepC_mod_var, err8stepCinput_mod_var], ...
     'FaceColor', [0.8500    0.3250    0.0980], 'BarWidth', barWidth)
 grid on
 title('Comparison error 8 step predictions')

@@ -7,8 +7,8 @@ cf = 50;
 removed = 200;
 
 load model_A
-Am = A;
-Cm = C;
+Am = best_model.A;
+Cm = best_model.C;
 S = 24;
 
 % Load data
@@ -41,7 +41,7 @@ N = length(y)
 % State space equation definition
 ord = 4;
 A = eye(ord);
-Re = diag(1*10e-4*ones(1,ord)); % Hiden state noise covariance matrix
+Re = diag([0 0 0 5*10e-6]); % Hiden state noise covariance matrix
 Re(3,3) = 0;
 Rw = 25; % Observation variance
 % usually C should be set here to, but in this case C is a function of time
@@ -144,3 +144,7 @@ fnum = fnum +1;
 figure(fnum)
 normplot(err_8)
 title('Normplot for error k=8')
+%%
+err1stepC_mod_var = err_1_var;
+err8stepC_mod_var = err_8_var;
+save('test_C_var','err1stepC_mod_var','err8stepC_mod_var')

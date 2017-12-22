@@ -48,26 +48,27 @@ plot(uFull)
 rm = 50;
 yFullold = yFull;
 
-% State space equation definition
-a1_var = 0;
-a2_var = 0;
+% Defining all variances
+a1_var = 1e-6;
+a2_var = 1e-6;
 a3_var = 0;
 a4_var = 0;
 a11_var = 0;
-c1_var = 5*10e-6;
-c24_var = 5*10e-6;
-c25_var = 5*10e-6;
-b0_var = 5*10e-6;
-b1_var = 0;
-b2_var = 0;
+c1_var = 1e-5;
+c24_var = 1e-5;
+c25_var = 1e-5;
+b0_var = 1e-6;
+b1_var = 1e-6;
+b2_var = 1e-6;
 b3_var = 0;
 b4_var = 0;
 b11_var = 0;
+
 ord = 15;
 A = eye(ord);
 % Re = diag(0*ones(1,ord)); % Hiden state noise covariance matrix
 Re = diag([a1_var a2_var a3_var a4_var a11_var 0 c1_var c24_var c25_var b0_var b1_var b2_var b3_var b4_var b11_var]);
-Rw = 25; % Observation variance
+Rw = 10; % Observation variance
 % usually C should be set here to, but in this case C is a function of time
 
 % set initial values
@@ -161,6 +162,7 @@ resid = e(modelweek*24*7 + 1:end);
 fnum = func_plotacfpacf(fnum, resid, cf, 0.05, 'resid');
 fnum = fnum +1;
 figure(fnum)
+disp('WhitenessTest for residuals')
 whitenessTest(resid)
 title('Cumulative periodogram for resid')
 fnum = fnum +1;
@@ -180,6 +182,7 @@ plot(time,yValid,time,yhat_1)
 fnum = func_plotacfpacf(fnum, err_1, cf, 0.05, 'error k=1');
 fnum = fnum +1;
 figure(fnum)
+disp('WhitenessTest for 1-step prediction')
 whitenessTest(err_1)
 title('Cumulative periodogram for error k=1')
 fnum = fnum +1;
